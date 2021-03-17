@@ -26,6 +26,17 @@ if [ "$HTTPS" = "true" ]; then
     echo "SetEnv HTTPS on" >> /var/www/Omeka/.htaccess
 fi
 
+cat /etc/apache2/apache2.conf
+
 # start apache
 source /etc/apache2/envvars
-exec apache2 -D FOREGROUND
+
+# setup directories and permissions
+mkdir -p /run/lock
+for dir in ${APACHE_RUN_DIR} ${APACHE_LOCK_DIR}
+do
+	mkdir -p ${dir}
+	chown -R "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$dir"
+done
+
+exec apache2ctl -D FOREGROUND
